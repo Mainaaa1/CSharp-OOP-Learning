@@ -188,7 +188,4 @@ The objective is to evolve from C# fundamentals into production-ready Web API de
 Today focused on writing expressive, maintainable, and idiomatic C# code.
 A strong grasp of OOP fundamentals will make ASP.NET Core significantly easier moving forward.
 
----
 
-**Author:** Ian
-**Track:** Backend Engineering (C# / ASP.NET Core)
