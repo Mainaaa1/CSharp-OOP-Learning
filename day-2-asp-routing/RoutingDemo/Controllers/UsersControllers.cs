@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RoutingDemo.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,8 +59,14 @@ namespace RoutingDemo.Controllers
 
         // POST: api/users
         [HttpPost]
-        public IActionResult Create([FromBody] User newUser)
-        {
-            newUser.Id = _users.Max(u => u.Id) + 1;
-            _users.Add(newUser);
+public IActionResult Create([FromBody] User newUser)
+{
+    if (newUser == null)
+        return BadRequest();
+
+    newUser.Id = _users.Any() ? _users.Max(u => u.Id) + 1 : 1;
+    _users.Add(newUser);
+
+    return CreatedAtAction(nameof(GetById), new { id = newUser.Id }, newUser);
 }
+ } }
