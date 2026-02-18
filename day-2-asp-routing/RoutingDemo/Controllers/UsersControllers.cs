@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RoutingDemo.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using RoutingDemo.Services;
 
 namespace RoutingDemo.Controllers
 {
@@ -10,63 +8,46 @@ namespace RoutingDemo.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private static readonly List<User> _users = new()
-        {
-            new User { Id = 1, Name = "Ian", IsActive = true },
-            new User { Id = 2, Name = "Alice", IsActive = false },
-            new User { Id = 3, Name = "Brian", IsActive = true }
-        };
+        private readonly IUserService _userService;
 
-        // GET: api/users
+        public UsersController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_users);
+            return Ok(_userService.GetAll());
         }
 
-        // GET: api/users/2
         [HttpGet("{id:int}")]
         public IActionResult GetById(int id)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-                return NotFound($"User with ID {id} not found.");
+            var user = _userService.GetById(id);
+            if (user == null) return NotFound();
 
             return Ok(user);
         }
 
-        // GET: api/users/search?name=Ian
         [HttpGet("search")]
         public IActionResult Search([FromQuery] string name)
         {
-            var results = _users
-                .Where(u => u.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            return Ok(results);
+            return Ok(_userService.Search(name));
         }
 
-        // GET: api/users/active/true
         [HttpGet("active/{isActive:bool}")]
         public IActionResult GetByStatus(bool isActive)
         {
-            var results = _users
-                .Where(u => u.IsActive == isActive)
-                .ToList();
-
-            return Ok(results);
+            return Ok(_userService.GetByStatus(isActive));
         }
 
-        // POST: api/users
         [HttpPost]
-public IActionResult Create([FromBody] User newUser)
-{
-    if (newUser == null)
-        return BadRequest();
+        public IActionResult Create([FromBody] User user)
+        {
+            var created = _userService.Create(user);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
 
-    newUser.Id = _users.Any() ? _users.Max(u => u.Id) + 1 : 1;
-    _users.Add(newUser);
-
-    return CreatedAtAction(nameof(GetById), new { id = newUser.Id }, newUser);
+        [HttpPut("{id:int}")]
 }
- } }
